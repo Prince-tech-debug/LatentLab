@@ -47,7 +47,7 @@ async def startup_db_client():
         raise
 
 
-# ── Socket.IO helpers ──────────────────────────────────────────────────────────
+# helpers
 async def _save_and_emit_bot(room: str, text: str):
     result = await chat_collection.insert_one({
         "username": "Latent",
@@ -66,7 +66,7 @@ async def _save_and_emit_bot(room: str, text: str):
     }, room=room)
 
 
-# ── Socket.IO events ───────────────────────────────────────────────────────────
+# SIO Events
 @sio.event
 async def join_research(sid, data):
     room = data.get("room")
@@ -110,7 +110,7 @@ async def send_message(sid, data):
     )
     is_remove_doc = "remove" in cmd_lower and "document" in cmd_lower
 
-    # ── Admin: clear history ───────────────────────────────────────────────────
+    #Admin priv
     if is_leader and is_clear_intent and not is_remove_doc:
         await sio.emit("bot_typing", {"room": room}, room=room)
         res = await clear_room_chat_history(room)
@@ -118,7 +118,7 @@ async def send_message(sid, data):
         await _save_and_emit_bot(room, res["message"])
         return
 
-    # ── Admin: remove document ─────────────────────────────────────────────────
+    # Admin: remove document
     if is_leader and is_remove_doc:
         parts = question.split("remove document", 1)
         doc_name = parts[1].strip() if len(parts) > 1 else ""
@@ -132,12 +132,12 @@ async def send_message(sid, data):
         await _save_and_emit_bot(room, res["message"])
         return
 
-    # ── Non-leader tries admin command ─────────────────────────────────────────
+    # Non-leader tries admin command 
     if not is_leader and (is_clear_intent or is_remove_doc):
         await _save_and_emit_bot(room, "❌ Only group leaders can use admin commands.")
         return
 
-    # ── Regular RAG query ──────────────────────────────────────────────────────
+    # Regular RAG query 
     await sio.emit("bot_typing", {"room": room}, room=room)
     history = []
     async for msg in chat_collection.find({"room": room}).sort("timestamp", -1).limit(12):
@@ -152,7 +152,7 @@ async def send_message(sid, data):
         await _save_and_emit_bot(room, f"⚠️ Error: {str(e)[:100]}")
 
 
-# ── Mount ──────────────────────────────────────────────────────────────────────
+# Mount
 socket_app = socketio.ASGIApp(sio, app, socketio_path="socket.io")
 
 if __name__ == "__main__":
