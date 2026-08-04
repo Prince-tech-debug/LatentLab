@@ -17,9 +17,9 @@ def _get_embedding_model():
     global _embedding_model
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
-        print("📥 Loading embedding model (may take a moment)...")
+        print("Loading embedding model (may take a moment)...")
         _embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-        print("✅ Embedding model loaded")
+        print("Embedding model loaded")
     return _embedding_model
 
 
