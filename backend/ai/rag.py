@@ -20,9 +20,9 @@ async def is_group_leader(username: str, room_name: str) -> bool:
 async def clear_room_chat_history(room_name: str) -> dict:
     try:
         result = await chat_collection.delete_many({"room": room_name})
-        return {"success": True, "message": f"✅ Cleared {result.deleted_count} messages from chat history"}
+        return {"success": True, "message": f"Cleared {result.deleted_count} messages from chat history"}
     except Exception as e:
-        return {"success": False, "message": f"❌ Failed to clear history: {str(e)}"}
+        return {"success": False, "message": f"Failed to clear history: {str(e)}"}
 
 
 async def remove_document_from_room(room_name: str, filename: str) -> dict:
@@ -45,13 +45,13 @@ async def remove_document_from_room(room_name: str, filename: str) -> dict:
             total_after = len(vs._collection.get().get('ids', []))
             removed = total_before - total_after
             if removed > 0:
-                return {"success": True, "message": f"✅ Removed '{filename}' ({removed} chunks deleted)"}
+                return {"success": True, "message": f"Removed '{filename}' ({removed} chunks deleted)"}
 
         available = ", ".join(sorted(stored_files)) if stored_files else "None"
-        return {"success": False, "message": f"❌ Document '{filename}' not found. Available: {available}"}
+        return {"success": False, "message": f"Document '{filename}' not found. Available: {available}"}
     except Exception as e:
         traceback.print_exc()
-        return {"success": False, "message": f"❌ Failed to remove document: {str(e)}"}
+        return {"success": False, "message": f"Failed to remove document: {str(e)}"}
 
 
 async def get_rag_answer(room_name: str, question: str, history: list) -> str:
